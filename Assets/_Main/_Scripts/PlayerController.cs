@@ -5,8 +5,8 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float speed;
-    [SerializeField] private Vector3 direction;
-    [SerializeField] private float distanceToDetectMouse;
+    private Vector3 direction;
+    private Vector3 moveSpeed;
     private Animator animator;
     private Camera m_camera;
     private Rigidbody rb;
@@ -24,35 +24,30 @@ public class PlayerController : MonoBehaviour
     {
         Movement();
         MoveToMousePosition();
+        
     }
     void Movement()
     {
         direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         animator.SetFloat("Speed", direction.magnitude);
-        if (direction != Vector3.zero)
+        if(direction.z != 0)
         {
-            transform.position += new Vector3(direction.x * speed, 0, direction.z * speed) *Time.deltaTime;
+            transform.position += transform.forward * speed * Time.deltaTime;
         }
-    }
-    void Look()
-    {
-        if (direction != Vector3.zero)
+        else if (direction.x != 0)
         {
-
-            var relative = (transform.position + direction) - transform.position;
-            var rot = Quaternion.LookRotation(relative, Vector3.up);
-            transform.rotation = rot;
+            transform.position += transform.right * speed * Time.deltaTime;
         }
     }
     void MoveToMousePosition()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hitInfo))
         {
             target = hitInfo.point;
             target.y = transform.position.y;
-            var distance = Vector3.Distance(transform.position, hitInfo.point);
-            if (distance >= 1f)
+            var dist = Vector2.Distance(transform.position, target);
+            if(dist >= 1f)
                 transform.LookAt(target);
         }
     }
