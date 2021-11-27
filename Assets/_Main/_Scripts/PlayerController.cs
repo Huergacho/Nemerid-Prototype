@@ -6,7 +6,6 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float speed;
     private Vector3 direction;
-    private Vector3 moveSpeed;
     private Animator animator;
     private Camera m_camera;
     private Rigidbody rb;
@@ -32,11 +31,11 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("Speed", direction.magnitude);
         if(direction.z != 0)
         {
-            transform.position += transform.forward * speed * Time.deltaTime;
+            transform.position += transform.forward * direction.z* speed * Time.deltaTime;
         }
         else if (direction.x != 0)
         {
-            transform.position += transform.right * speed * Time.deltaTime;
+            transform.position += transform.right * direction.x * speed * Time.deltaTime;
         }
     }
     void MoveToMousePosition()
@@ -47,7 +46,7 @@ public class PlayerController : MonoBehaviour
             target = hitInfo.point;
             target.y = transform.position.y;
             var dist = Vector2.Distance(transform.position, target);
-            if(dist >= 1f)
+            if(dist >= 0.01f)
                 transform.LookAt(target);
         }
     }
