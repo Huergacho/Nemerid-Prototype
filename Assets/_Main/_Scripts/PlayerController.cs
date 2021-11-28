@@ -5,6 +5,11 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float speed;
+    [SerializeField] private bool moveAroundMousePosition;
+    [SerializeField] private bool moveWithMousePosition;
+    [SerializeField] private bool aimToMousePosition;
+    [SerializeField] private GameObject testObj;
+    private Vector3 targetPos;
     private Vector3 direction;
     private Animator animator;
     private Camera m_camera;
@@ -21,9 +26,27 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Movement();
-        MoveToMousePosition();
-        
+       // Movement();
+        if (moveAroundMousePosition)
+        {
+            AimToMousePosition();
+            Movement();
+            moveWithMousePosition = false;
+        }
+        if (moveWithMousePosition)
+        {
+            MoveWithMouse();
+            moveAroundMousePosition = false;
+        }
+        if (aimToMousePosition)
+        {
+            if (Input.GetMouseButtonDown(0))
+            {
+            AimToMousePosition();
+            }
+            Movement();
+        }
+
     }
     void Movement()
     {
@@ -33,21 +56,40 @@ public class PlayerController : MonoBehaviour
         {
             transform.position += transform.forward * direction.z* speed * Time.deltaTime;
         }
-        else if (direction.x != 0)
+        if (direction.x != 0)
         {
             transform.position += transform.right * direction.x * speed * Time.deltaTime;
         }
     }
-    void MoveToMousePosition()
+    void AimToMousePosition()
     {
-        Ray ray = m_camera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hitInfo))
+        
+        if (Physics.Raycast(CalculateMousePos(), out RaycastHit hitInfo))
         {
             target = hitInfo.point;
             target.y = transform.position.y;
             var dist = Vector2.Distance(transform.position, target);
             if(dist >= 0.01f)
                 transform.LookAt(target);
+        }
+    }
+    Ray CalculateMousePos()
+    {
+        return  m_camera.ScreenPointToRay(Input.mousePosition);
+    }
+
+    void MoveWithMouse()
+    {
+        CalculateMousePos();
+        if (Input.GetMouseButton(0))
+        {
+            AimToMousePosition();
+            animator.SetFloat("Speed", 1);
+            transform.position += transform.forward * speed * Time.deltaTime;
+        }
+        else
+        {
+            animator.SetFloat("Speed", 0);
         }
     }
 }
