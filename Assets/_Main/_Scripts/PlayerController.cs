@@ -68,8 +68,7 @@ public class PlayerController : MonoBehaviour
         {
             target = hitInfo.point;
             target.y = transform.position.y;
-            var dist = Vector2.Distance(transform.position, target);
-            if(dist >= 0.01f)
+            if(canMove())
                 transform.LookAt(target);
         }
     }
@@ -81,9 +80,9 @@ public class PlayerController : MonoBehaviour
     void MoveWithMouse()
     {
         CalculateMousePos();
-        if (Input.GetMouseButton(0))
+        AimToMousePosition();
+        if (Input.GetMouseButton(0) && canMove())
         {
-            AimToMousePosition();
             animator.SetFloat("Speed", 1);
             transform.position += transform.forward * speed * Time.deltaTime;
         }
@@ -91,5 +90,11 @@ public class PlayerController : MonoBehaviour
         {
             animator.SetFloat("Speed", 0);
         }
+    }
+    private bool canMove()
+    {
+        if (Vector2.Distance(transform.position, target) >= 0.01f)
+            return true;
+        else return false;
     }
 }
