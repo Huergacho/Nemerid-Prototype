@@ -64,3 +64,5 @@ sysinfo.txt
 crashlytics-build.properties
 
 *.log
+Logs/AssetImportWorker0-prev.log
+*.log
